@@ -2,6 +2,7 @@ drop table Comments;
 drop table Products;
 drop table Categories;
 drop table Users;
+drop sequence seq_user;
 drop sequence seq_category;
 drop sequence seq_product;
 drop sequence seq_comment;
