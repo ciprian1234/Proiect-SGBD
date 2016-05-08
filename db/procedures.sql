@@ -2,6 +2,7 @@ CREATE OR REPLACE PACKAGE javaApp IS
   procedure registerUser(username IN VARCHAR2,password IN VARCHAR2,email IN VARCHAR2,address in VARCHAR2,telephone IN VARCHAR2);
   procedure getRandomProducts(productsCursor out SYS_REFCURSOR, nr_produse in integer);
   procedure setDiscount(p_category IN int, p_discount IN int);
+  procedure buyProduct(p_user_id IN int , p_product_id IN int, p_transaction_quantity IN int);
 END javaApp;
 /
 
@@ -79,6 +80,7 @@ CREATE OR REPLACE PACKAGE BODY db_management IS
     v_email varchar2(50);
     v_telephone varchar2(20) := '0741231234';
     v_address varchar2(50);
+    v_wallet users.user_wallet%type;
     v_contor integer := 1;
   BEGIN
     FOR index_1 IN 97..122 LOOP
@@ -89,9 +91,10 @@ CREATE OR REPLACE PACKAGE BODY db_management IS
               v_password := 'p'||v_username;
               v_email := 'random_email'||to_char(v_contor)||'@gmail.com';
               v_address := 'random address '||to_char(v_contor);
+              v_wallet := dbms_random.value(10, 9999);
               v_contor := v_contor + 1;
-              insert into users(user_username, user_password, user_email, user_telephone, user_adress) 
-                values (v_username, v_password, v_email, v_telephone, v_address);
+              insert into users(user_username, user_password, user_email, user_telephone, user_adress, user_wallet) 
+                values (v_username, v_password, v_email, v_telephone, v_address, v_wallet);
           END LOOP;
         END LOOP;
       END LOOP;
@@ -199,6 +202,40 @@ CREATE OR REPLACE PACKAGE BODY javaApp IS
     update products set product_discount = p_discount 
       where product_category = p_category;
   END setDiscount;
+  
+  
+  procedure buyProduct(p_user_id IN int , p_product_id IN int, p_transaction_quantity IN int)
+  IS
+    v_product_price products.product_price%type;
+    v_product_quantity integer;
+    v_product_discount products.product_discount%type;
+    v_discount products.product_price%type;
+    v_total_price transactions.transaction_price%type;
+    v_user_wallet users.user_wallet%type;
+  BEGIN
+    
+    select product_price, product_quantity, product_discount 
+      into v_product_price, v_product_quantity, v_product_discount
+        from products where product_id = p_product_id;
+    IF(v_product_quantity - p_transaction_quantity < 0) THEN
+      RAISE_APPLICATION_ERROR(-20006,'outOfStockQuantityExcedeed');
+    END IF;  
+    
+    v_discount := trunc(v_product_price * v_product_discount/100, 2);
+    v_total_price := trunc((v_product_price - v_discount)*p_transaction_quantity, 2);
+    
+    select user_wallet into v_user_wallet from users where user_id = p_user_id;
+    IF(v_user_wallet - v_total_price < 0) THEN
+      RAISE_APPLICATION_ERROR(-20007,'notEnoughMoney');
+    END IF;
+    
+    insert into transactions(user_id, product_id, transaction_quantity, transaction_date, transaction_price)
+      values(p_user_id, p_product_id, p_transaction_quantity, sysdate, v_total_price);
+    update users set user_wallet = v_user_wallet - v_total_price
+      where user_id = p_user_id;
+    update products set product_quantity = v_product_quantity - p_transaction_quantity
+      where product_id = p_product_id;
+  END buyProduct;
   
 END javaApp;
 /

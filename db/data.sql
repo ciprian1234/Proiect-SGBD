@@ -1,14 +1,14 @@
 --useri
-insert into users(user_username, user_password, user_email, user_telephone, user_adress) 
-  values ('ciprian', 'ciprian', 'asd@gmail.com', '0747190637', 'Str Crizantemelor Nr 7');
-insert into users(user_username, user_password, user_email, user_telephone, user_adress)
-  values ('marius', 'marius', 'bcdef@gmail.com', '0741234123', 'Bacau ...');
+insert into users(user_username, user_password, user_email, user_telephone, user_adress, user_wallet) 
+  values ('ciprian', 'ciprian', 'asd@gmail.com', '0747190637', 'Str Crizantemelor Nr 7', 9999.99);
+insert into users(user_username, user_password, user_email, user_telephone, user_adress, user_wallet)
+  values ('marius', 'marius', 'bcdef@gmail.com', '0741234123', 'Bacau ...', 9999.99);
 
 --insert 500k users
-BEGIN
-  db_management.insert_random_users(1);
-END;
-/
+--BEGIN
+--  db_management.insert_random_users(1);
+--END;
+--/
 
 --Categorii
 INSERT INTO CATEGORIES(category_name ,category_description) 

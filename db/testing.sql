@@ -16,14 +16,20 @@ END;
 
 --Test procedura de discount
 BEGIN
-  javaApp.setDiscount(1, 20);
+  javaApp.setDiscount(1, 10);
 END;
 /
 
+--test tranzactie
+BEGIN
+  javaApp.buyProduct(1,1,2);
+END;
+/
 
 --log as SYS and execute grant execute on utl_file to system
 --create directory produse as '/home/ciprian/Desktop/proiecte_fac/sgbd/proiect/db';
 --trebuie privilegii write
+--export
 BEGIN
   db_management.export_products('products.csv');
 END;

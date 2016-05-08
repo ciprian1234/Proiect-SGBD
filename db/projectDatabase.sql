@@ -36,7 +36,8 @@ CREATE TABLE Users (
   user_password VARCHAR2(50) NOT NULL,
   user_email VARCHAR2(100) NOT NULL,
   user_telephone VARCHAR2(20) NOT NULL,
-  user_adress VARCHAR2(100) NOT NULL
+  user_adress VARCHAR2(100) NOT NULL,
+  user_wallet number(10,2) DEFAULT 0 NOT NULL
 );
 /
 
@@ -59,7 +60,7 @@ CREATE TABLE Transactions (
   transaction_id integer NOT NULL PRIMARY KEY,
   user_id integer NOT NULL,
   product_id integer NOT NULL,
-  transaction_quantitity number(5) default 1 not null,
+  transaction_quantity number(5) default 1 not null,
   transaction_date date,
   transaction_price number(10,2),
   CONSTRAINT fk_transaction_user FOREIGN KEY (user_id) 
