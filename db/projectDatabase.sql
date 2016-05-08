@@ -28,8 +28,8 @@ CREATE TABLE Products (
 /
 
 CREATE TABLE Users (
-  user_id NUMBER(3) NOT NULL PRIMARY KEY,
-  user_username VARCHAR2(50) NOT NULL UNIQUE,
+  user_id integer NOT NULL PRIMARY KEY,
+  user_username VARCHAR2(50) NOT NULL,
   user_password VARCHAR2(50) NOT NULL,
   user_email VARCHAR2(100) NOT NULL,
   user_telephone VARCHAR2(20) NOT NULL,
