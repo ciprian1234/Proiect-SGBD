@@ -6,19 +6,72 @@ END javaApp;
 /
 
 CREATE OR REPLACE PACKAGE db_management IS
-  procedure export_products(filename varchar2);
+  procedure import_products(p_filename IN varchar2);
+  procedure export_products(filename IN varchar2);
   procedure insert_random_users(p_number int);
   procedure insert_random_products(p_number int);
 END db_management;
 /
 
 CREATE OR REPLACE PACKAGE BODY db_management IS
-
-  procedure export_products(filename varchar2) IS
+  --procedura import date csv
+  procedure import_products(p_filename IN varchar2)
+  IS
+    v_file UTL_FILE.FILE_TYPE;
+    v_line VARCHAR2 (1000);
+    v_category products.product_category%type:= 1;
+    v_image products.product_image%type:= 'img/default.jpg';
+    v_price products.product_price%type := 999.99;
+    v_name products.product_name%type := 'Default name';
+    v_quantity products.product_quantity%type := 100;
   BEGIN
-    dbms_output.put_line('export');
-  END export_products;
+    v_file := UTL_FILE.FOPEN ('PRODUSE', p_filename, 'r');
+    IF UTL_FILE.IS_OPEN(v_file) THEN
+      LOOP
+        BEGIN
+          UTL_FILE.GET_LINE(v_file, v_line, 1000);
+          IF v_line IS NULL THEN
+            EXIT;
+          END IF;
+          v_category := REGEXP_SUBSTR(V_LINE, '[^;]+', 1, 1);
+          v_image := REGEXP_SUBSTR(V_LINE, '[^;]+', 1, 2);
+          v_price := REGEXP_SUBSTR(V_LINE, '[^;]+', 1, 3);
+          v_name := REGEXP_SUBSTR(V_LINE, '[^;]+', 1, 4);
+          v_quantity := REGEXP_SUBSTR(V_LINE, '[^;]+', 1, 5);
+          INSERT INTO Products(PRODUCT_CATEGORY,PRODUCT_IMAGE,PRODUCT_PRICE,PRODUCT_NAME,PRODUCT_QUANTITY) 
+            VALUES(v_category, v_image, v_price, v_name, v_quantity);
+          COMMIT;
+          EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+              EXIT;
+          END;
+      END LOOP;
+    END IF;
+    UTL_FILE.FCLOSE(v_file);
+  END import_products;
   
+  --procedura export date csv
+  procedure export_products(filename varchar2)
+  IS
+    v_file UTL_FILE.FILE_TYPE;
+    CURSOR c_products IS SELECT * from products;
+    v_row products%ROWTYPE;
+  BEGIN
+    v_file := UTL_FILE.FOPEN('PRODUSE', filename,'w',32767);
+    FOR v_row IN c_products LOOP
+        UTL_FILE.PUT(v_file, v_row.product_category||';');
+        UTL_FILE.PUT(v_file, v_row.product_image||';');
+        UTL_FILE.PUT(v_file, v_row.product_price||';');
+        UTL_FILE.PUT(v_file, v_row.product_name||';');
+        UTL_FILE.PUT(v_file, v_row.product_quantity);
+        UTL_FILE.NEW_LINE(v_file);
+    END LOOP;
+    UTL_FILE.FCLOSE(v_file);  
+  END export_products;
+    
+  --procedura insert random users with
+  --all combinations from a-z 4 characters
+  --aproximativ 500.000 inregistrari
   procedure insert_random_users(p_number int)
   IS
     v_username varchar2(50);
@@ -46,6 +99,7 @@ CREATE OR REPLACE PACKAGE BODY db_management IS
   END insert_random_users;
   
   
+  --procedura de generare produse random pentru fiecare categorie
   procedure insert_random_products(p_number int)
   IS
     v_category int:= 1;
