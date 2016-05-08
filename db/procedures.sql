@@ -218,7 +218,7 @@ CREATE OR REPLACE PACKAGE BODY javaApp IS
       into v_product_price, v_product_quantity, v_product_discount
         from products where product_id = p_product_id;
     IF(v_product_quantity - p_transaction_quantity < 0) THEN
-      RAISE_APPLICATION_ERROR(-20006,'outOfStockQuantityExcedeed');
+      RAISE_APPLICATION_ERROR(-20006, 'outOfStockQuantityExcedeed');
     END IF;  
     
     v_discount := trunc(v_product_price * v_product_discount/100, 2);
@@ -226,11 +226,11 @@ CREATE OR REPLACE PACKAGE BODY javaApp IS
     
     select user_wallet into v_user_wallet from users where user_id = p_user_id;
     IF(v_user_wallet - v_total_price < 0) THEN
-      RAISE_APPLICATION_ERROR(-20007,'notEnoughMoney');
+      RAISE_APPLICATION_ERROR(-20007, 'notEnoughMoney');
     END IF;
     
     insert into transactions(user_id, product_id, transaction_quantity, transaction_date, transaction_price)
-      values(p_user_id, p_product_id, p_transaction_quantity, sysdate, v_total_price);
+      values(p_user_id, p_product_id, p_transaction_quantity, to_char(sysdate, 'dd-mm-yyyy hh24:mi:ss'), v_total_price);
     update users set user_wallet = v_user_wallet - v_total_price
       where user_id = p_user_id;
     update products set product_quantity = v_product_quantity - p_transaction_quantity

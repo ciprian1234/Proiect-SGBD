@@ -61,7 +61,7 @@ CREATE TABLE Transactions (
   user_id integer NOT NULL,
   product_id integer NOT NULL,
   transaction_quantity number(5) default 1 not null,
-  transaction_date date,
+  transaction_date varchar2(50),
   transaction_price number(10,2),
   CONSTRAINT fk_transaction_user FOREIGN KEY (user_id) 
     REFERENCES Users(user_id),
