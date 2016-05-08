@@ -1,14 +1,22 @@
 set serveroutput on;
+
+--Test n number of random products
 DECLARE
   lista_produse SYS_REFCURSOR;
   v_linie products%rowtype;
 BEGIN
-  javaApp.getRandomProducts(lista_produse, 5);
+  javaApp.getRandomProducts(lista_produse, 2);
   LOOP
     fetch lista_produse into v_linie;
     EXIT WHEN lista_produse%NOTFOUND;
     dbms_output.put_line(v_linie.product_name);
   END LOOP;
+END;
+/
+
+
+BEGIN
+  javaApp.setDiscount(1, 20);
 END;
 /
 
@@ -28,3 +36,7 @@ BEGIN
   db_management.import_products('products.csv');
 END;
 /
+
+
+select * from (select * from products order by dbms_random.value)
+  where rownum <= 2;

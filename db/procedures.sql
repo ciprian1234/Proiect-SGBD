@@ -1,7 +1,7 @@
 CREATE OR REPLACE PACKAGE javaApp IS
   procedure registerUser(username IN VARCHAR2,password IN VARCHAR2,email IN VARCHAR2,address in VARCHAR2,telephone IN VARCHAR2);
   procedure getRandomProducts(productsCursor out SYS_REFCURSOR, nr_produse in integer);
-  procedure setDiscount(procent IN int);
+  procedure setDiscount(p_category IN int, p_discount IN int);
 END javaApp;
 /
 
@@ -178,13 +178,26 @@ CREATE OR REPLACE PACKAGE BODY javaApp IS
   PROCEDURE getRandomProducts(productsCursor OUT SYS_REFCURSOR, nr_produse IN integer)
   IS
   BEGIN
-    open productsCursor for select * from products;
+    --IF(productsCursor is null) THEN
+    --  RAISE_APPLICATION_ERROR(-20003,'invalidCursor');
+    --END IF;
+    IF(nr_produse <= 0) THEN
+      RAISE_APPLICATION_ERROR(-20004,'secondParameterInvalid');
+    END IF;
+    open productsCursor for select * from (select * from products order by product_price)
+                              where rownum <= nr_produse;
   END getRandomProducts;
   
-  procedure setDiscount(procent IN int)
+  procedure setDiscount(p_category IN int, p_discount IN int)
   IS
+    v_upper_bound integer;
   BEGIN
-    dbms_output.put_line('Discount: '||procent);
+    select max(category_id) into v_upper_bound from categories;
+    IF(p_category < 1 or p_category > v_upper_bound) THEN
+      RAISE_APPLICATION_ERROR(-20005,'invalidCategory');
+    END IF;
+    update products set product_discount = p_discount 
+      where product_category = p_category;
   END setDiscount;
   
 END javaApp;

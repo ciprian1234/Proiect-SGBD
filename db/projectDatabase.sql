@@ -22,6 +22,7 @@ CREATE TABLE Products (
   product_price NUMBER(10,2) NOT NULL,
   product_name VARCHAR2(200) NOT NULL,
   product_quantity NUMBER(5) NOT NULL,
+  product_discount NUMBER(2,0) DEFAULT 0,
   CONSTRAINT fk_Category FOREIGN KEY(product_category)
   REFERENCES Categories(category_id)
 );

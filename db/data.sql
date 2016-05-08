@@ -4,6 +4,7 @@ insert into users(user_username, user_password, user_email, user_telephone, user
 insert into users(user_username, user_password, user_email, user_telephone, user_adress)
   values ('marius', 'marius', 'bcdef@gmail.com', '0741234123', 'Bacau ...');
 
+--insert 500k users
 BEGIN
   db_management.insert_random_users(1);
 END;
