@@ -14,7 +14,7 @@ BEGIN
 END;
 /
 
-
+--Test procedura de discount
 BEGIN
   javaApp.setDiscount(1, 20);
 END;
@@ -37,6 +37,6 @@ BEGIN
 END;
 /
 
-
+--Other Stuff
 select * from (select * from products order by dbms_random.value)
   where rownum <= 2;

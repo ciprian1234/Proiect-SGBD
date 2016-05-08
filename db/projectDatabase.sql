@@ -1,3 +1,4 @@
+drop table Transactions;
 drop table Comments;
 drop table Products;
 drop table Categories;
@@ -6,6 +7,7 @@ drop sequence seq_user;
 drop sequence seq_category;
 drop sequence seq_product;
 drop sequence seq_comment;
+drop sequence seq_transaction;
 
 
 CREATE TABLE Categories (
@@ -40,12 +42,12 @@ CREATE TABLE Users (
 
 CREATE TABLE Comments (
   comment_id integer NOT NULL PRIMARY KEY,
-  user_id NUMBER(3) NOT NULL,
-  product_id number(10) NOT NULL,
-  text varchar2(1000),
-  rating number(2,1),
-  pros integer,
-  cons integer,
+  user_id integer NOT NULL,
+  product_id integer NOT NULL,
+  comment_text varchar2(1000),
+  comment_rating number(2,1),
+  comment_pros integer,
+  comment_cons integer,
   CONSTRAINT fk_comment_user FOREIGN KEY (user_id) 
     REFERENCES Users(user_id),
   CONSTRAINT fk_comment_product FOREIGN KEY (product_id) 
@@ -53,7 +55,21 @@ CREATE TABLE Comments (
 );
 /
 
+CREATE TABLE Transactions (
+  transaction_id integer NOT NULL PRIMARY KEY,
+  user_id integer NOT NULL,
+  product_id integer NOT NULL,
+  transaction_quantitity number(5) default 1 not null,
+  transaction_date date,
+  transaction_price number(10,2),
+  CONSTRAINT fk_transaction_user FOREIGN KEY (user_id) 
+    REFERENCES Users(user_id),
+  CONSTRAINT fk_transaction_product FOREIGN KEY (product_id) 
+    REFERENCES Products(product_id)
+);
+
 CREATE SEQUENCE seq_user;
 CREATE SEQUENCE seq_category;
 CREATE SEQUENCE seq_product;
 CREATE SEQUENCE seq_comment;
+CREATE SEQUENCE seq_transaction;

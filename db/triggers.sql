@@ -11,7 +11,7 @@ BEGIN
     else
         -- ID was set via insert, so update the sequence
         select greatest(nvl(max(user_id),0), :new.user_id) into max_id from users;
-        select seq_product.nextval into cur_seq from dual;
+        select seq_user.nextval into cur_seq from dual;
         while cur_seq < max_id
         loop
             select seq_user.nextval into cur_seq from dual;
@@ -78,10 +78,33 @@ BEGIN
     else
         -- ID was set via insert, so update the sequence
         select greatest(nvl(max(comment_id),0), :new.comment_id) into max_id from Comments;
-        select seq_category.nextval into cur_seq from dual;
+        select seq_comment.nextval into cur_seq from dual;
         while cur_seq < max_id
         loop
             select seq_comment.nextval into cur_seq from dual;
         end loop;
     end if;
 END;
+/
+
+CREATE OR REPLACE TRIGGER transactionid_autoincrement 
+BEFORE INSERT ON transactions
+FOR EACH ROW
+DECLARE 
+  max_id number;
+  cur_seq number;
+BEGIN 
+  if :new.transaction_id is null then
+        -- No ID passed, get one from the sequence
+        select seq_transaction.nextval into :new.transaction_id from dual;
+    else
+        -- ID was set via insert, so update the sequence
+        select greatest(nvl(max(transaction_id),0), :new.transaction_id) into max_id from Transactions;
+        select seq_transaction.nextval into cur_seq from dual;
+        while cur_seq < max_id
+        loop
+            select seq_transaction.nextval into cur_seq from dual;
+        end loop;
+    end if;
+END;
+/
